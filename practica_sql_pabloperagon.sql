@@ -123,3 +123,45 @@ from (select id_copia from copia_pelicula where id_copia not in
 (select id_copia from prestamo where fecha_reserva is not null or fecha_entrega is not null)) as cd
 join copia_pelicula cp on cd.id_copia = cp.id_copia
 group by cp.titulo_pelicula;
+
+
+/*
+/* Cuenta los generos favoritos de cada socio*/
+SELECT
+    s.id_socio,
+    s.nombre,
+    s.apellidos,
+    p.genero AS genero_favorito
+FROM
+    socio s
+JOIN
+    prestamo pr ON s.id_socio = pr.id_socio
+JOIN
+    copia_pelicula cp ON pr.id_copia = cp.id_copia
+JOIN
+    pelicula p ON cp.titulo_pelicula = p.titulo
+GROUP BY
+    s.id_socio, p.genero
+having COUNT(*) = (
+        SELECT
+            MAX(cnt)
+        FROM
+            (SELECT
+                s.id_socio,
+                p.genero,
+                COUNT(*) AS cnt
+            FROM
+                socio s
+            JOIN
+                prestamo pr ON s.id_socio = pr.id_socio
+            JOIN
+                copia_pelicula cp ON pr.id_copia = cp.id_copia
+            JOIN
+                pelicula p ON cp.titulo_pelicula = p.titulo
+            GROUP BY
+                s.id_socio, p.genero) AS subquery
+        WHERE
+            subquery.id_socio = s.id_socio
+    );
+    
+    */
